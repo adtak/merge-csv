@@ -6,6 +6,7 @@ extern crate serde_derive;
 use std::env;
 use std::error::Error;
 use std::ffi::OsString;
+use std::fs;
 use std::process;
 
 #[derive(Debug, Deserialize)]
@@ -28,13 +29,18 @@ fn main() {
 
 fn run() -> Result<(), Box<dyn Error>> {
     let file_path = get_first_args()?;
-    let mut rdr = csv::Reader::from_path(file_path)?;
-
     let mut csv_records = vec!();
-    for result in rdr.deserialize() {
-        let record: CsvRecord = result?;
-        csv_records.push(record);
+    for entry in fs::read_dir(file_path)? {
+        let path = entry.unwrap().path();
+        if "csv" == path.extension().unwrap() {
+            let mut rdr = csv::Reader::from_path(path)?;
+            for result in rdr.deserialize() {
+                let record: CsvRecord = result?;
+                csv_records.push(record);
+            }
+        }
     }
+
     println!("{}", csv_records.len());
     Ok(())
 }
@@ -58,16 +64,20 @@ fn get_first_args() -> Result<OsString, Box<dyn Error>> {
 // impl Eq for Text {}
 
 // fn merge_conversation(
-//         tweet: Vec<Text>,
-//         replay: Vec<Text>
+//         mut tweet: Vec<Text>,
+//         mut replay: Vec<Text>
 // ) -> Result<Vec<Text>, Box<dyn Error>> {
-//     let th: HashSet<Text> = HashSet::from_iter(tweet);
-//     let rh: HashSet<Text> = HashSet::from_iter(replay);
+    // A
+    // tweet.append(&mut replay);
+    // Ok(HashSet::<Text>::from_iter(tweet).into_iter().collect())
 
-//     Ok(
-//         th.union(&rh)
-//             .into_iter()
-//             .map(|x| (*x).clone())
-//             .collect()
-//     )
+    // B
+    // let th: HashSet<Text> = HashSet::from_iter(tweet);
+    // let rh: HashSet<Text> = HashSet::from_iter(replay);
+    // Ok(
+    //     th.union(&rh)
+    //         .into_iter()
+    //         .map(|x| (*x).clone())
+    //         .collect()
+    // )
 // }
