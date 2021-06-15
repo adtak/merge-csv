@@ -3,13 +3,15 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 
+use std::collections::HashSet;
 use std::env;
 use std::error::Error;
 use std::ffi::OsString;
 use std::fs;
+use std::iter::FromIterator;
 use std::process;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Hash, PartialEq, Serialize)]
 // #[serde(rename_all = "PascalCase")]
 struct CsvRecord {
     tweet_id: u64,
@@ -19,6 +21,8 @@ struct CsvRecord {
     reply_tweet: String,
     raw_reply_tweet: String,
 }
+
+impl Eq for CsvRecord {}
 
 fn main() {
     if let Err(err) = run() {
@@ -40,8 +44,15 @@ fn run() -> Result<(), Box<dyn Error>> {
             }
         }
     }
+    let unique_records: Vec<_> = HashSet::<CsvRecord>::from_iter(csv_records).into_iter().collect();
 
-    println!("{}", csv_records.len());
+    println!("Result len: {}", unique_records.len());
+
+    let mut wtr = csv::Writer::from_path("./merged.csv")?;
+    for record in unique_records {
+        wtr.serialize(record)?;
+    }
+    wtr.flush()?;
     Ok(())
 }
 
