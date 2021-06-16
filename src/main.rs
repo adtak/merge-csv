@@ -9,6 +9,7 @@ use std::error::Error;
 use std::ffi::OsString;
 use std::fs;
 use std::iter::FromIterator;
+use std::path::Path;
 use std::process;
 
 #[derive(Debug, Deserialize, Hash, PartialEq, Serialize)]
@@ -45,14 +46,9 @@ fn run() -> Result<(), Box<dyn Error>> {
         }
     }
     let unique_records: Vec<_> = HashSet::<CsvRecord>::from_iter(csv_records).into_iter().collect();
-
     println!("Result len: {}", unique_records.len());
+    write_csv(unique_records, "./merged.csv")?;
 
-    let mut wtr = csv::Writer::from_path("./merged.csv")?;
-    for record in unique_records {
-        wtr.serialize(record)?;
-    }
-    wtr.flush()?;
     Ok(())
 }
 
@@ -63,16 +59,19 @@ fn get_first_args() -> Result<OsString, Box<dyn Error>> {
     }
 }
 
-// use std::collections::HashSet;
-// use std::iter::FromIterator;
-
-// #[derive(PartialEq, Hash, Clone)]
-// struct Text {
-//     pub id: u32,
-//     pub tweet: String,
-// }
-
-// impl Eq for Text {}
+fn write_csv<T, I, P>(records: T, path: P) -> Result<(), Box<dyn Error>>
+where 
+    T: IntoIterator<Item=I>,
+    I: serde::Serialize,
+    P: AsRef<Path>
+{
+    let mut wtr = csv::Writer::from_path(path)?;
+    for record in records {
+        wtr.serialize(record)?;
+    }
+    wtr.flush()?;
+    Ok(())
+}
 
 // fn merge_conversation(
 //         mut tweet: Vec<Text>,
@@ -92,3 +91,8 @@ fn get_first_args() -> Result<OsString, Box<dyn Error>> {
     //         .collect()
     // )
 // }
+
+#[cfg(test)]
+mod tests {
+    
+}
