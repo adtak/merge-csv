@@ -38,11 +38,7 @@ fn run() -> Result<(), Box<dyn Error>> {
     for entry in fs::read_dir(file_path)? {
         let path = entry.unwrap().path();
         if "csv" == path.extension().unwrap() {
-            let mut rdr = csv::Reader::from_path(path)?;
-            for result in rdr.deserialize() {
-                let record: CsvRecord = result?;
-                csv_records.push(record);
-            }
+            csv_records.append(&mut read_csv(path)?);
         }
     }
     let unique_records: Vec<_> = HashSet::<CsvRecord>::from_iter(csv_records).into_iter().collect();
@@ -57,6 +53,19 @@ fn get_first_args() -> Result<OsString, Box<dyn Error>> {
         None => Err(From::from("expected 1 argument, but got none")),
         Some(file_path) => Ok(file_path),
     }
+}
+
+fn read_csv<P>(path: P) -> Result<Vec<CsvRecord>, Box<dyn Error>>
+where
+    P: AsRef<Path>,
+{
+    let mut records = vec!();
+    let mut rdr = csv::Reader::from_path(path)?;
+    for result in rdr.deserialize() {
+        let record: CsvRecord = result?;
+        records.push(record);
+    }
+    Ok(records)
 }
 
 fn write_csv<T, I, P>(records: T, path: P) -> Result<(), Box<dyn Error>>
@@ -94,5 +103,5 @@ where
 
 #[cfg(test)]
 mod tests {
-    
+
 }
