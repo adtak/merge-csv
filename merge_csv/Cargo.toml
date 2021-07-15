@@ -1,12 +1,10 @@
 [package]
-name = "merge-csv"
+name = "merge_csv"
 version = "0.1.0"
-authors = ["adtak <adtak>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 csv = "1.1.6"
-serde = "1.0.126"
-serde_derive = "1.0.126"
+serde = { version = "1.0.126", features = ["derive"] }
