@@ -64,26 +64,5 @@ where
     Ok(())
 }
 
-// fn merge_conversation(
-//         mut tweet: Vec<Text>,
-//         mut replay: Vec<Text>
-// ) -> Result<Vec<Text>, Box<dyn Error>> {
-    // A
-    // tweet.append(&mut replay);
-    // Ok(HashSet::<Text>::from_iter(tweet).into_iter().collect())
-
-    // B
-    // let th: HashSet<Text> = HashSet::from_iter(tweet);
-    // let rh: HashSet<Text> = HashSet::from_iter(replay);
-    // Ok(
-    //     th.union(&rh)
-    //         .into_iter()
-    //         .map(|x| (*x).clone())
-    //         .collect()
-    // )
-// }
-
 #[cfg(test)]
-mod tests {
-
-}
+mod tests {}

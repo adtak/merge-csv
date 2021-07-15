@@ -15,6 +15,4 @@ fn get_first_args() -> Result<OsString, Box<dyn Error>> {
 }
 
 #[cfg(test)]
-mod tests {
-
-}
+mod tests {}
