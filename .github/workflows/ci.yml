@@ -5,15 +5,17 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-
+  CI:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ./merge_csv
     steps:
     - uses: actions/checkout@v2
     - name: Build
