@@ -90,8 +90,7 @@ mod tests {
     fn test_write_csv() -> Result<(), Box<dyn Error>> {
         let mut d = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         d.push("resource/test_write.csv");
-        let expected = vec![
-            CsvRecord {
+        let expected = vec![CsvRecord {
             tweet_id: 3999999999999999999,
             tweet: "tweet str".to_string(),
             raw_tweet: "raw tweet str".to_string(),
