@@ -65,4 +65,54 @@ where
 }
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_read_csv() -> Result<(), Box<dyn Error>> {
+        let mut d = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        d.push("resource/test_read.csv");
+        let records = read_csv(d)?;
+
+        assert!(records.iter().len() == 1);
+        for record in records {
+            assert!(record.tweet_id == 1999999999999999999);
+            assert!(record.tweet == "テスト");
+            assert!(record.raw_tweet == "テスト_テスト");
+            assert!(record.reply_tweet_id == 2999999999999999999);
+            assert!(record.reply_tweet == "test");
+            assert!(record.raw_reply_tweet == "test_test");
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_write_csv() -> Result<(), Box<dyn Error>> {
+        let mut d = std::path::PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        d.push("resource/test_write.csv");
+        let expected = vec![
+            CsvRecord {
+            tweet_id: 3999999999999999999,
+            tweet: "tweet str".to_string(),
+            raw_tweet: "raw tweet str".to_string(),
+            reply_tweet_id: 4999999999999999999,
+            reply_tweet: "reply str".to_string(),
+            raw_reply_tweet: "raw reply str".to_string(),
+        }];
+        write_csv(&expected, &d)?;
+        let actual = read_csv(&d)?;
+
+        assert!(actual.iter().len() == expected.iter().len());
+        for z in actual.iter().zip(expected.iter()) {
+            let (a, e) = z;
+            assert!(a.tweet_id == e.tweet_id);
+            assert!(a.tweet == e.tweet);
+            assert!(a.raw_tweet == e.raw_tweet);
+            assert!(a.reply_tweet_id == e.reply_tweet_id);
+            assert!(a.reply_tweet == e.reply_tweet);
+            assert!(a.raw_reply_tweet == e.raw_reply_tweet);
+        }
+        fs::remove_file(&d)?;
+        Ok(())
+    }
+}
